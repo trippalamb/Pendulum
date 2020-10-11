@@ -1,0 +1,15 @@
+#configuration{
+    position:absolute;
+    top:0px;
+    left:50px;
+}
+
+#data{
+    position:absolute;
+    top:0px;
+    left:600px;
+}
+
+#data{
+    float:right;
+}
