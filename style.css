@@ -1,13 +1,27 @@
 #configuration{
-    position:absolute;
-    top:0px;
-    left:50px;
 }
 
 #data{
+}
+
+div.form-container{
     position:absolute;
-    top:0px;
-    left:600px;
+    border:solid;
+    border-color:black;
+    border-width:2px;
+    padding:0px;
+    background-color:white;
+}
+
+div.form-container h2{
+    border-bottom:solid;
+    border-color:black;
+    border-width:2px;
+    padding:5px;
+}
+
+div.form-container form{
+    padding:10px;
 }
 
 #data{

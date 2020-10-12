@@ -19,9 +19,9 @@
 <body>
     <div id="content-container">
         <div id="header">
-            <div id="configuration">
+            <div id="configuration" class="form-container">
                 <h2>Configuration</h2>
-                <form>
+                <form class="text-right">
 
                     <div class="form-group">
                         <label>Method: </label>
@@ -59,28 +59,28 @@
 
                 </form>
             </div>
-            <div id="data">
+            <div id="data" class="form-container">
                 <h2>Data</h2>
-                <form>
+                <form class="text-right">
                     <div class="form-group">
-                        <label>Pos:</label>
+                        <label>Position:</label>
                         <input id="pos" value="0.0" readonly />
                     </div>
                     <div class="form-group">
-                        <label>Vel:</label>
+                        <label>Velocity:</label>
                         <input id="vel" value="0.0" readonly/>
                     </div>
                     <div class="form-group">
-                        <label>Acc:</label>
+                        <label>Acceleration:</label>
                         <input id="acc" value="0.0" readonly />
-                    </div>
-                    <div class="form-group">
-                        <label>Total Distance Error:</label>
-                        <input id="td-error" value="0.0" readonly />
                     </div>
                     <div class="form-group">
                         <label>Absolute Postion Error:</label>
                         <input id="ap-error" value="0.0" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label>Total Distance Error:</label>
+                        <input id="td-error" value="0.0" readonly />
                     </div>
                 </form>
             </div>
@@ -92,7 +92,9 @@
 
         </div>
         <div id="description-container">
-
+            <h2>Description</h2>
+            <p> Here will be a description of everything that is happening.</p>
+            <!--Add a description of the page-->
         </div>
     </div>
     <script>

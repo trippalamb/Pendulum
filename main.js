@@ -1,11 +1,11 @@
 //const Pendulum = require("./pendulum.js");
-var fps = 60;
+var fps = 30;
 var refresh = 1000 / fps;
 var speed = 0.5;
 var startTime;
 var svg;
 var e;
-var truth
+var truth;
 var offset = {};
 var r;
 var e_td = 0;
@@ -15,6 +15,8 @@ var tde_trace = [];
 var ape_trace = [];
 var plotlyDiv;
 var data;
+var drawInterval;
+var chartInterval;
 
 function main() {
 
@@ -26,22 +28,19 @@ function main() {
     e = new Pendulum(0.0, p0, 0.0, 0.0);
     truth = new Pendulum(0.0, p0, 0.0, 0.0, { color: "blue" });
     
-    setInterval(draw, refresh);
-    setInterval(updateChart, refresh);
+    drawInterval = setInterval(draw, refresh);
+    chartInterval = setInterval(updateChart, refresh);
 }
 
 function init() {
 
-    var width = $(window).width();
-    var height = $(window).height() * 0.8;
-    //Create SVG element
-    svg = d3.select("svg")
-        .attr("width", width)
-        .attr("height", height);
+   
+    plotlyDiv = document.getElementById('plotly-container');
 
-    resize();
 
     $(window).resize(resize);
+    $("#method").width($("#min-dt").outerWidth())
+                .height($("#min-dt").outerHeight());
 
     $("#btn-update").on("click", reconfigurePendulum);
 
@@ -59,18 +58,38 @@ function init() {
 
     data = [tde_trace, ape_trace];
 
-    plotlyDiv = document.getElementById('plotly-container');
+    //TODO: add plotly layout options
     Plotly.newPlot(plotlyDiv, data);
+
+    resize();
+    //TODO: make h2 of .form-container open and close form from view
+    //TODO: hide or disable options in the configuration form for embedded versus explicit methods
+
 
 }
 
 function resize() {
     var w = $(window).width();
     var h = $(window).height() * 0.8;
-    var size = Math.min(w, h)
+    var size = Math.min(w, h);
     r = size / 3.0;
-    offset.x = size / 2.0;
-    offset.y = size / 4.0;
+
+    offset.x = w / 2.0;
+    offset.y = h / 4.0;
+
+    //Create SVG element
+    svg = d3.select("svg")
+        .attr("width", w)
+        .attr("height", offset.y + r + 30);
+
+
+    $("#plotly-container div").width(w * 0.95);
+    $("#plotly-container div").height(r * 2.0);
+    Plotly.newPlot(plotlyDiv, data);
+
+
+    $("#configuration").offset({ top: 50, left: 50 });
+    $("#data").offset({ top: 50, left: (w - 50 - $("#data").outerWidth()) });
 
 
 }
@@ -122,11 +141,11 @@ function draw() {
 
 
     //update data
-    $("#pos").val(e.px.val);
-    $("#vel").val(e.vx.val);
-    $("#acc").val(e.ax.val);
-    $("#td-error").val(td_error);
-    $("#ap-error").val(ap_error);
+    $("#pos").val(e.px.val.toFixed(2));
+    $("#vel").val(e.vx.val.toFixed(2));
+    $("#acc").val(e.ax.val.toFixed(2));
+    $("#td-error").val(td_error.toExponential(5));
+    $("#ap-error").val(ap_error.toExponential(5));
 
 }
 
