@@ -1,24 +1,29 @@
-var fps = 30;
-var refresh = 1000 / fps;
-var speed = 0.5;
-var startTime;
-var svg;
-var e;
-var truth;
-var offset = {};
-var r;
-var td_error = 0.0;
-var tde_trace = [];
-var ape_trace = [];
-var plotlyDiv;
-var data;
-var layout;
+//graphic globals
+var fps = 30; //frames per second
+var refresh = 1000 / fps; //refresh rate in seconds
+var speed = 0.5; //simulation speed adjustment
+var svg; //svg container
+var offset = {}; //pendulum pivot point
+
+//pendulum globals
+var startTime; //real time start of sim
+var e; //simulated pendulum entity
+var truth; //truth pendulum entity
+var r; //radius (in pixels) of pendulum
+var td_error = 0.0; //total distance error
+
+//plotly globals
+var plotlyDiv; //plotly container
+var tde_trace = []; //total distance error trace for plotly
+var ape_trace = []; //absolute position error trace for plotly
+var data; //plotly argument for trace data
+var layout; //plotly argument for layout information
 
 function main() {
 
     init();
     
-    var p0 = -1.5 * r;
+    let p0 = -1.5 * r;
 
     startTime = Date.now();
     e = new Pendulum(0.0, p0, 0.0, 0.0);
@@ -74,9 +79,10 @@ function init() {
 
 function resize() {
 
-    var w = $(window).width();
-    var h = $(window).height() * 0.8;
-    var size = Math.min(w, h);
+    //TODO: shift entire page down if width is too small
+    let w = $(window).width();
+    let h = $(window).height() * 0.8;
+    let size = Math.min(w, h);
     r = size / 4.0;
 
     offset.x = w / 2.0;
@@ -100,7 +106,7 @@ function resize() {
 }
 
 function reconfigurePendulum() {
-    var options = {
+    let options = {
         minDh: parseFloat($("#min-dt").val()),
         maxDh: parseFloat($("#max-dt").val()),
         error: parseFloat($("#epsilon").val()),
@@ -125,18 +131,18 @@ function reconfigurePendulum() {
 
 function draw() {
 
-    var dt = Date.now() - startTime;
-    var time = speed * (dt / 1000.0);
-    var e_prevPos = e.px.val;
-    var truth_prevPos = truth.px.val;
+    let dt = Date.now() - startTime;
+    let time = speed * (dt / 1000.0);
+    let e_prevPos = e.px.val;
+    let truth_prevPos = truth.px.val;
 
     e.timestep(time);
     truth.setToTruth(time);
 
-    var e_dp = Math.abs(e_prevPos - e.px.val);
-    var truth_dp = Math.abs(truth_prevPos - truth.px.val);
+    let e_dp = Math.abs(e_prevPos - e.px.val);
+    let truth_dp = Math.abs(truth_prevPos - truth.px.val);
     td_error += Math.abs(e_dp - truth_dp);
-    var ap_error = e.px.val - truth.px.val;
+    let ap_error = e.px.val - truth.px.val;
 
     //draw svg
     svg.selectAll("*").remove();
@@ -168,7 +174,8 @@ function updateChart() {
     var width = $(window).width();
     if (ape_trace.x.length > width*5) {
 
-        var save = ape_trace.x.length;
+        //toss out extraneous data once the amount of 
+        //data is larger than can be shown on screen
         var tde = [];
         var ape = [];
 
@@ -186,10 +193,7 @@ function updateChart() {
         tde_trace.x = tde.map(a => a.x);
         tde_trace.y = tde.map(a => a.y);
 
-        if (save !== tde_trace.x.length) {
-            console.log("here");
-        }
-        Plotly.newPlot(plotlyDiv, data);
+        Plotly.newPlot(plotlyDiv, data, layout);
     }
     else {
         Plotly.extendTraces(plotlyDiv, {
@@ -203,6 +207,7 @@ function updateChart() {
 
 
 // implementation of the "Largest Triangle Three Bucket" algorithm by Sveinn Steinarsson
+// I did not write this.
 function largestTriangleThreeBucket(data, threshold, xProperty, yProperty) {
     yProperty = yProperty || 0;
     xProperty = xProperty || 1;
