@@ -1,4 +1,3 @@
-//const Pendulum = require("./pendulum.js");
 var fps = 30;
 var refresh = 1000 / fps;
 var speed = 0.5;
@@ -8,15 +7,12 @@ var e;
 var truth;
 var offset = {};
 var r;
-var e_td = 0;
-var truth_td = 0;
 var td_error = 0.0;
 var tde_trace = [];
 var ape_trace = [];
 var plotlyDiv;
 var data;
-var drawInterval;
-var chartInterval;
+var layout;
 
 function main() {
 
@@ -28,8 +24,8 @@ function main() {
     e = new Pendulum(0.0, p0, 0.0, 0.0);
     truth = new Pendulum(0.0, p0, 0.0, 0.0, { color: "blue" });
     
-    drawInterval = setInterval(draw, refresh);
-    chartInterval = setInterval(updateChart, refresh);
+    setInterval(draw, refresh);
+    setInterval(updateChart, refresh);
 }
 
 function init() {
@@ -44,22 +40,30 @@ function init() {
 
     $("#btn-update").on("click", reconfigurePendulum);
 
-    tde_trace = {
-        x: [0.0],
-        y: [0.0],
-        type: 'scatter'
-    };
-
     ape_trace = {
         x: [0.0],
         y: [0.0],
-        type: 'scatter'
+        type: 'scatter',
+        name: "Absolute Position Error"
     };
 
-    data = [tde_trace, ape_trace];
+    tde_trace = {
+        x: [0.0],
+        y: [0.0],
+        type: 'scatter',
+        name: "Total Distance Error"
+    };
 
-    //TODO: add plotly layout options
-    Plotly.newPlot(plotlyDiv, data);
+    data = [ape_trace, tde_trace];
+    layout = {
+        title: "Error Over Time",
+        xaxis: {
+            title: "Time (seconds)"
+        },
+        yaxis: {
+            title: "Error (pixels)"
+        }
+    }
 
     resize();
     //TODO: make h2 of .form-container open and close form from view
@@ -69,10 +73,11 @@ function init() {
 }
 
 function resize() {
+
     var w = $(window).width();
     var h = $(window).height() * 0.8;
     var size = Math.min(w, h);
-    r = size / 3.0;
+    r = size / 4.0;
 
     offset.x = w / 2.0;
     offset.y = h / 4.0;
@@ -85,7 +90,7 @@ function resize() {
 
     $("#plotly-container div").width(w * 0.95);
     $("#plotly-container div").height(r * 2.0);
-    Plotly.newPlot(plotlyDiv, data);
+    Plotly.newPlot(plotlyDiv, data, layout);
 
 
     $("#configuration").offset({ top: 50, left: 50 });
@@ -151,35 +156,35 @@ function draw() {
 
 function updateChart() {
     var dt = (Date.now() - startTime) / 1000;
-    var y0 = parseFloat($("#td-error").val());
-    var y1 = parseFloat($("#ap-error").val());
-
-    tde_trace.x.push(dt);
-    tde_trace.y.push(y0);
+    var y0 = parseFloat($("#ap-error").val());
+    var y1 = parseFloat($("#td-error").val());
 
     ape_trace.x.push(dt);
-    ape_trace.y.push(y1);
+    ape_trace.y.push(y0);
+
+    tde_trace.x.push(dt);
+    tde_trace.y.push(y1);
 
     var width = $(window).width();
-    if (tde_trace.x.length > width*5) {
+    if (ape_trace.x.length > width*5) {
 
-        var save = tde_trace.x.length;
+        var save = ape_trace.x.length;
         var tde = [];
         var ape = [];
 
-        for (var i = 0; i < tde_trace.x.length; i++) {
-            tde.push({ x: tde_trace.x[i], y: tde_trace.y[i] });
+        for (var i = 0; i < ape_trace.x.length; i++) {
             ape.push({ x: ape_trace.x[i], y: ape_trace.y[i] });
+            tde.push({ x: tde_trace.x[i], y: tde_trace.y[i] });
         }
 
-        tde = largestTriangleThreeBucket(tde, width/2.0, "x", "y");
         ape = largestTriangleThreeBucket(ape, width/2.0, "x", "y");
-
-        tde_trace.x = tde.map(a => a.x);
-        tde_trace.y = tde.map(a => a.y);
+        tde = largestTriangleThreeBucket(tde, width/2.0, "x", "y");
 
         ape_trace.x = ape.map(a => a.x);
         ape_trace.y = ape.map(a => a.y);
+
+        tde_trace.x = tde.map(a => a.x);
+        tde_trace.y = tde.map(a => a.y);
 
         if (save !== tde_trace.x.length) {
             console.log("here");
