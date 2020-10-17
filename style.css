@@ -18,6 +18,7 @@ div.form-container h2{
     border-color:black;
     border-width:2px;
     padding:5px;
+    cursor:pointer;
 }
 
 div.form-container form{
@@ -26,4 +27,9 @@ div.form-container form{
 
 #data{
     float:right;
+}
+
+
+h2 i{
+    float: right;
 }

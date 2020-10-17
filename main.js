@@ -19,6 +19,8 @@ var ape_trace = []; //absolute position error trace for plotly
 var data; //plotly argument for trace data
 var layout; //plotly argument for layout information
 
+var explicitMethods = ["euler", "midpoint", "classic4th"];
+
 function main() {
 
     init();
@@ -71,27 +73,56 @@ function init() {
     }
 
     resize();
-    //TODO: make h2 of .form-container open and close form from view
-    //TODO: hide or disable options in the configuration form for embedded versus explicit methods
 
+    //TODO: change toggle to slide up animation
+    $(".form-container h2").on("click", function(){
+        $(this).parent().find("form").toggle();
+    });
+
+    $("#method").on("change", () => {
+        if (explicitMethods.includes($("#method").val())) {
+            $("#max-dt").parent().attr("hidden", true);
+            $("#epsilon").parent().attr("hidden", true);
+            $("#sf").parent().attr("hidden", true);
+        }
+        else {
+            $("#max-dt").parent().attr("hidden", false);
+            $("#epsilon").parent().attr("hidden", false);
+            $("#sf").parent().attr("hidden", false);
+        }
+    });
 
 }
 
 function resize() {
 
-    //TODO: shift entire page down if width is too small
+    //TODO: bug with safety factor input on resize
+    let margin = 50;
+
+    $("#configuration").width($("#configuration").width());
+    $("#data").width($("#data").width());
+    let formWidth = 2.0 * margin + ($("#configuration").width() + $("#data").width());
+    let formHeight = margin + Math.max($("#configuration").height(), $("#data").height())
+
     let w = $(window).width();
     let h = $(window).height() * 0.8;
     let size = Math.min(w, h);
     r = size / 4.0;
 
-    offset.x = w / 2.0;
-    offset.y = h / 4.0;
+    if (w < (formWidth + 2.0 * r)) {
+        offset.x = w / 2.0;
+        offset.y = formHeight + (h / 4.0);
+    }
+    else {
+        offset.x = w / 2.0;
+        offset.y = h / 4.0;
+    }
 
     //Create SVG element
+    let svgHeight = Math.max((offset.y + r + 30), formHeight);
     svg = d3.select("svg")
         .attr("width", w)
-        .attr("height", offset.y + r + 30);
+        .attr("height", svgHeight + margin); //margin twice on purpose
 
 
     $("#plotly-container div").width(w * 0.95);
@@ -99,8 +130,8 @@ function resize() {
     Plotly.newPlot(plotlyDiv, data, layout);
 
 
-    $("#configuration").offset({ top: 50, left: 50 });
-    $("#data").offset({ top: 50, left: (w - 50 - $("#data").outerWidth()) });
+    $("#configuration").offset({ top: margin, left: margin });
+    $("#data").offset({ top: margin, left: (w - margin - $("#data").outerWidth()) });
 
 
 }
