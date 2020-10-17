@@ -1,7 +1,7 @@
 //graphic globals
 var fps = 30; //frames per second
 var refresh = 1000 / fps; //refresh rate in seconds
-var speed = 0.5; //simulation speed adjustment
+var speed = 1.0; //simulation speed adjustment
 var svg; //svg container
 var offset = {}; //pendulum pivot point
 
@@ -23,13 +23,16 @@ var explicitMethods = ["euler", "midpoint", "classic4th"];
 
 function main() {
 
+    $("#configuration").width($("#configuration").width());
+    $("#data").width($("#data").width());
+
     init();
     
     let p0 = -1.5 * r;
 
     startTime = Date.now();
     e = new Pendulum(0.0, p0, 0.0, 0.0);
-    truth = new Pendulum(0.0, p0, 0.0, 0.0, { color: "blue" });
+    truth = new Pendulum(0.0, p0, 0.0, 0.0, { color: "#0749b8" });
     
     setInterval(draw, refresh);
     setInterval(updateChart, refresh);
@@ -96,12 +99,11 @@ function init() {
 
 function resize() {
 
-    //TODO: bug with safety factor input on resize
     let margin = 50;
 
-    $("#configuration").width($("#configuration").width());
-    $("#data").width($("#data").width());
-    let formWidth = 2.0 * margin + ($("#configuration").width() + $("#data").width());
+    let cw = $("#configuration").width();
+    let dw = $("#data").width();
+    let formWidth = 2.0 * margin + ( cw + dw);
     let formHeight = margin + Math.max($("#configuration").height(), $("#data").height())
 
     let w = $(window).width();
@@ -109,12 +111,13 @@ function resize() {
     let size = Math.min(w, h);
     r = size / 4.0;
 
-    if (w < (formWidth + 2.0 * r)) {
-        offset.x = w / 2.0;
+    //set the x offset to be evenly between the configuration and data forms
+    offset.x = (cw + margin) + ((w - cw - dw - 2.0 * margin) / 2.0);
+    let br = (typeof (e) !== "undefined") ? e.bobRadius*2.0 : 40; //get the pendulum bob radius
+    if (w < (formWidth + 2.0 * r + br)) {
         offset.y = formHeight + (h / 4.0);
     }
     else {
-        offset.x = w / 2.0;
         offset.y = h / 4.0;
     }
 
@@ -203,7 +206,7 @@ function updateChart() {
     tde_trace.y.push(y1);
 
     var width = $(window).width();
-    if (ape_trace.x.length > width*5) {
+    if (ape_trace.x.length > width*10) {
 
         //toss out extraneous data once the amount of 
         //data is larger than can be shown on screen
@@ -215,8 +218,8 @@ function updateChart() {
             tde.push({ x: tde_trace.x[i], y: tde_trace.y[i] });
         }
 
-        ape = largestTriangleThreeBucket(ape, width/2.0, "x", "y");
-        tde = largestTriangleThreeBucket(tde, width/2.0, "x", "y");
+        ape = largestTriangleThreeBucket(ape, width/2.0, "y", "x");
+        tde = largestTriangleThreeBucket(tde, width/2.0, "y", "x");
 
         ape_trace.x = ape.map(a => a.x);
         ape_trace.y = ape.map(a => a.y);

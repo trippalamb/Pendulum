@@ -33,3 +33,8 @@ div.form-container form{
 h2 i{
     float: right;
 }
+
+#description-container{
+    margin-left: 50px;
+    margin-right: 50px;
+}

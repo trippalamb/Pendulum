@@ -31,18 +31,18 @@
                             <option value="midpoint">Midpoint</option>
                             <option value="classic4th">Classic 4th</option>
                             <option value="cashkarp" selected>Cash-Karp</option>
-                            <option value="fehlberg45">Fehlberg 4-5</option>
-                            <option value="fehlberg78">Fehlberg 7-8</option>
+                            <!--<option value="fehlberg45">Fehlberg 4-5</option>
+                            <option value="fehlberg78">Fehlberg 7-8</option>-->
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label>Min dt: </label>
+                        <label>Min dt (seconds): </label>
                         <input id="min-dt" value="1.0e-4" />
                     </div>
 
                     <div class="form-group">
-                        <label>Max dt: </label>
+                        <label>Max dt (seconds): </label>
                         <input id="max-dt" value="1.0" />
                     </div>
 
@@ -69,7 +69,7 @@
                     </div>
                     <div class="form-group">
                         <label>Velocity:</label>
-                        <input id="vel" value="0.0" readonly/>
+                        <input id="vel" value="0.0" readonly />
                     </div>
                     <div class="form-group">
                         <label>Acceleration:</label>
@@ -94,13 +94,60 @@
         </div>
         <div id="description-container">
             <h2>Description</h2>
-            <p> Here will be a description of everything that is happening.</p>
-            <!--TODO: Add a description of the page-->
+            <p>There&#39;s a lot happening on this page, but let&#39;s break it down. Aside from this description, there are 4 main components.</p>
+            <ul>
+                <li>pendulum simulation</li>
+                <li>configuration form</li>
+                <li>data form</li>
+                <li>error plot</li>
+
+            </ul>
+            <p>Let&#39;s go through them piece by piece. Each section will start with a general overview and some will have a second section that delves into the more technical details of what is happening.</p>
+            <h3>Pendulum Simulation</h3>
+            <p>In the middle of the page is the pendulum simulation. It is an actual live simulation, not a recording. It simulates a perfect pendulum with no friction or air resistance.</p>
+            <p>The default simulation method is accurate enough that it will not be immediately obvious that there are two pendulums being displayed for quite some time (after 10 minutes of my development machine the position error was still under 1/1000 of a pixel). There is the black pendulum that is immediately in view which is the simulated pendulum. Behind the black pendulum there is a blue one that represents the true calculated position of the pendulum.</p>
+            <p>By choosing a less accurate method (such as Euler) and setting the <strong>Min dt</strong> to a higher value (such as 1.0)</p>
+            <h4>Detailed Technical Information</h4>
+            <p>The simulation of the pendulum is being drive by my npm package <a href='https://www.npmjs.com/package/generic-rk'>generic-rk</a>, which offers a generic solution for any explicit or embedded Runge-Kutta method that can be represented with a Butcher tableau. <a href='https://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods'>This Wikipedia article</a> offers more information.</p>
+            <p>The acceleration of the pendulum at any given point is given by the formula</p>
+<pre><code class='language-javascript' lang='javascript'>omega = (2.0)^0.5
+acceleration = -omega^2.0 * position;
+</code></pre>
+            <p>For more information on the Runge-Kutta algorithm see the npm package of GitHub page for generic-rk.</p>
+            <p>The simulation will vary from computer to computer and likely at different points in time. This is due to making the choice to run the simulation in real time rather than at a dedicated time step. The simulation attempts to update the screen 30 times a second if the computer used to display the simulation can&#39;t keep up there can definitely be some variation in error. Additionally, some strange behavior can occur if the tab the simulation is open in loses focus. The simulation is also subject to standard floating-point errors. All distances for the simulation are done in pixels so that the data matches the visualization.</p>
+            <p>The visualization of the pendulum is driven by d3.</p>
+            <h3>Configuration Form</h3>
+            <p>The configuration form represents the available and tunable arguments for the Runge-Kutta algorithm. Most visitors are likely only going to need the first two fields.</p>
+            <ul>
+                <li><strong>Method</strong> - This field is a list of some the Runge-Kutta methods currently implemented by generic-rk. In general the methods become more accurate as we descend. See the Wikipedia article mentioned earlier for more information on methods.</li>
+                <li><strong>Min dt</strong> [seconds] - This field is the minimum allowable timestep for the time-adaptive methods, or it is the exact timestep for the explicit methods. This field can used to ensure that the time-adaptive methods will always run in a reasonable time frame regardless of potential errors. <strong>Min dt</strong> will effectively override the epsilon field.</li>
+                <li><strong>Max dt</strong> [seconds] - This field is only present for time-adaptive methods. It is possible for the adaptive timestep portion of the Runge-Kutta algorithm to decide to take a very large timestep. This field offers protection from that. <strong>Max dt</strong> will effectively override the epsilon field.</li>
+                <li><strong>Epsilon</strong> - This field is only present for time-adaptive methods. This field represents the maximum allowable error between the two calculated orders present in the embedded methods. It is in charge of the adaptive part of the timestep. It will be overridden by <strong>Min dt</strong> and <strong>Max dt</strong>.</li>
+                <li><strong>Safety Factor</strong> - This field is only present for time-adaptive methods. The error between different ordered calculations in the explicit methods is an estimate and this offers protection from a potential error in estimation.</li>
+                <li><strong>Update</strong> - This button will restart the sim with the new arguments. It will restart the sim at the correct position for the pendulum at the time the user clicks the button.</li>
+
+            </ul>
+            <h3>Data Form</h3>
+            <p>The data form represents the current information about the pendulum system.</p>
+            <ul>
+                <li><strong>Position</strong> - This is the current position in pixels of the center of the bob on the pendulum. The zero position is directly beneath the pivot. The distance is measured around the circumference of the swing.</li>
+                <li><strong>Velocity</strong> - This is the current velocity in pixels per second of the center of the bob on the pendulum. Clockwise is negative, and counter-clockwise is positive. </li>
+                <li><strong>Acceleration</strong> - This is the current acceleration in pixels per second^2 of the center of the bob on the pendulum. Clockwise is negative, and counter-clockwise is positive. </li>
+                <li><strong>Absolute Position Error</strong> - This is the current absolute error in position of the simulated pendulum. The error is calculated from the current center of the black bob and the current center of the blue bob.</li>
+                <li><strong>Total Distance Error</strong> - This is the current total distance traveled error of the simulated pendulum. This is a sum of the change in the <strong>Absolute Position Error</strong> at every time step. When you first start the sim you can see in the Error Plot that the <strong>Total Distance Error</strong> exactly matches the <strong>Absolute Position Error</strong> over the first half swing.</li>
+
+            </ul>
+            <h3>Error Plot</h3>
+            <p>There isn&#39;t too much to the error plot. It updates in real time along with the pendulum, and it plots the values of  <strong>Absolute Position Error</strong> and <strong>Total Distance Error</strong> over time. If the user lets the simulation run long enough some noticeable simplifications in the data may appear on the chart. This is due to the page attempting to keep the total number of data points to a reasonable level.</p>
+            <h4>Detailed Technical Information</h4>
+            <p>
+                The error plot is created using the JS implementation of Plotly. It uses an implementation of the &quot;Largest Triangle Three Bucket&quot; algorithm by Sveinn Steinarsson to reduce the data points without any significant loss in data visualization. I did not write the implementation of this algorithm that is being used. The visible loss in data seems to be due to the need to run the reduction multiple times not necessarily from an error in the implementation of the algorithm.
+            </p>
         </div>
     </div>
-    <script>
-        main();
-    </script>
+<script>
+    main();
+</script>
 
 </body>
 </html>

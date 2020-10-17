@@ -41,6 +41,8 @@ class Pendulum extends RK.ODESystem{
         this.omega = Math.sqrt(2.0);
         this.rk = new RK.RK(2, options.method, {minDh: options.minDh, maxDh: options.maxDh, error:options.error, safetyFactor:options.sf});
         this.odeSetup();
+
+        this.bobRadius = 20;
     }
 
     timestep(targetTime) {
@@ -98,7 +100,7 @@ class Pendulum extends RK.ODESystem{
             .attr("class", "bob")
             .attr("cx", pos.x)
             .attr("cy", pos.y)
-            .attr("r", 20)
+            .attr("r", this.bobRadius)
             .attr("fill", this.color);
 
         svg.append("path")
