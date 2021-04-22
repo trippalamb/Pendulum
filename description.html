@@ -16,15 +16,15 @@
 <h3>Pendulum Simulation</h3>
 <p>In the middle of the page is the pendulum simulation. It is an actual live simulation, not a recording. It simulates a perfect pendulum with no friction or air resistance.</p>
 <p>The default simulation method is accurate enough that it will not be immediately obvious that there are two pendulums being displayed for quite some time (after 10 minutes of my development machine the position error was still under 1/1000 of a pixel). There is the black pendulum that is immediately in view which is the simulated pendulum. Behind the black pendulum there is a blue one that represents the true calculated position of the pendulum.</p>
-<p>By choosing a less accurate method (such as Euler) and setting the <strong>Min dt</strong> to a higher value (such as 1.0)</p>
+<p>By choosing a less accurate method (such as Euler) and setting the <strong>Min dt</strong> to a higher value (such as 1.0), you can make the truth pendulum appear reasonably quickly.</p>
 <h4>Detailed Technical Information</h4>
-<p>The simulation of the pendulum is being drive by my npm package <a href='https://www.npmjs.com/package/generic-rk'>generic-rk</a>, which offers a generic solution for any explicit or embedded Runge-Kutta method that can be represented with a Butcher tableau. <a href='https://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods'>This Wikipedia article</a> offers more information.</p>
+<p>The simulation of the pendulum is being drive by my npm package <a href='https://www.npmjs.com/package/generic-rk'>generic-rk</a>, which offers a generic solution for any explicit or embedded Runge-Kutta method that can be represented by Butcher tableau. <a href='https://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods'>This Wikipedia article</a> offers more information.</p>
 <p>The acceleration of the pendulum at any given point is given by the formula</p>
 <pre><code class='language-javascript' lang='javascript'>omega = (2.0)^0.5
 acceleration = -omega^2.0 * position;
 </code></pre>
 <p>For more information on the Runge-Kutta algorithm see the npm package of GitHub page for generic-rk.</p>
-<p>The simulation will vary from computer to computer and likely at different points in time. This is due to making the choice to run the simulation in real time rather than at a dedicated time step. The simulation attempts to update the screen 30 times a second if the computer used to display the simulation can&#39;t keep up there can definitely be some variation in error. Additionally, some strange behavior can occur if the tab the simulation is open in loses focus. The simulation is also subject to standard floating-point errors. All distances for the simulation are done in pixels so that the data matches the visualization.</p>
+<p>The simulation will vary from computer to computer and likely between separate runs. This is due to making the choice to run the simulation in real time rather than at a dedicated time step. The simulation attempts to update the screen 30 times a second if the computer used to display the simulation can&#39;t keep up there can definitely be some variation in error. Additionally, some strange behavior can occur if the tab the simulation is open in loses focus. The simulation is also subject to standard floating-point errors. All distances for the simulation are done in pixels so that the data matches the visualization.</p>
 <p>The visualization of the pendulum is driven by d3.</p>
 <h3>Configuration Form</h3>
 <p>The configuration form represents the available and tunable arguments for the Runge-Kutta algorithm. Most visitors are likely only going to need the first two fields.</p>
