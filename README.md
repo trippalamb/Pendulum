@@ -15,7 +15,7 @@ In the middle of the page is the pendulum simulation. It is an actual live simul
 
 The default simulation method is accurate enough that it will not be immediately obvious that there are two pendulums being displayed for quite some time (after 10 minutes of my development machine the position error was still under 1/1000 of a pixel). There is the black pendulum that is immediately in view which is the simulated pendulum. Behind the black pendulum there is a blue one that represents the true calculated position of the pendulum.
 
-By choosing a less accurate method (such as Euler) and setting the __Min dt__ to a higher value (such as 1.0)
+By choosing a less accurate method (such as Euler) and setting the <strong>Min dt</strong> to a higher value (such as 1.0), you can make the truth pendulum appear reasonably quickly.
 
 #### Detailed Technical Information
 
@@ -30,7 +30,7 @@ acceleration = -omega^2.0 * position;
 
 For more information on the Runge-Kutta algorithm see the npm package of GitHub page for generic-rk.
 
-The simulation will vary from computer to computer and likely at different points in time. This is due to making the choice to run the simulation in real time rather than at a dedicated time step. The simulation attempts to update the screen 30 times a second if the computer used to display the simulation can't keep up there can definitely be some variation in error. Additionally, some strange behavior can occur if the tab the simulation is open in loses focus. The simulation is also subject to standard floating-point errors. All distances for the simulation are done in pixels so that the data matches the visualization.
+The simulation will vary from computer to computer and likely between separate runs. This is due to making the choice to run the simulation in real time rather than at a dedicated time step. The simulation attempts to update the screen 30 times a second if the computer used to display the simulation can't keep up there can definitely be some variation in error. Additionally, some strange behavior can occur if the tab the simulation is open in loses focus. The simulation is also subject to standard floating-point errors. All distances for the simulation are done in pixels so that the data matches the visualization.
 
 The visualization of the pendulum is driven by d3.
 
